@@ -1,15 +1,23 @@
 var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var recursive = require('recursive-readdir');
+  path = require('path'),
+ favicon = require('serve-favicon'),
+  logger = require('morgan'),
+  cookieParser = require('cookie-parser'),
+  bodyParser = require('body-parser'),
+  recursive = require('recursive-readdir'),
+  debug = require('debug')('app');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var things = require("./routes/things");
 var session = require("./routes/session");
+
+
+
+
+
+
+
 
 require("./config/db").connect(function(err, conn){
   if(err)
@@ -19,8 +27,7 @@ require("./config/db").connect(function(err, conn){
 });
 
 
-
-var app = express();
+app = express();
 app.locals.pretty = true;
 
 // view engine setup
@@ -82,6 +89,27 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
+
+
+
+
+
+if (require.main === module) {
+  app.set('port', process.env.PORT || 3000);
+  var server = app.listen(app.get('port'), function() {
+    // the callback is added as a listener for the server's 'listen' event
+    // see: http://nodejs.org/api/net.html#net_server_listen_path_callback
+
+    // server is an http.Server, which extends a net.Server
+    // http://nodejs.org/api/http.html#http_class_http_server
+    // http://nodejs.org/api/net.html#net_class_net_server
+    // http://nodejs.org/api/net.html#net_server_address
+    debug('server started on port %s', server.address().port);
+
+    // provide access to server via exported app for querying and adding listeners
+    app.set('server', server);
+  });
+}
 
 
 module.exports = app;
