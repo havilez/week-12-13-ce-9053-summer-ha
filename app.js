@@ -18,14 +18,15 @@ var session = require("./routes/session");
 
 
 
+if (require.main === module) {
 
-require("./config/db").connect(function(err, conn){
-  if(err)
-    console.log(err);
-  else
-    console.log("connected");
-});
-
+  require("./config/db").connect(function (err, conn) {
+    if (err)
+      console.log(err);
+    else
+      console.log("connected");
+  });
+}
 
 app = express();
 app.locals.pretty = true;

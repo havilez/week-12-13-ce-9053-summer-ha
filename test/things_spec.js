@@ -6,6 +6,7 @@ var expect = require('chai').expect;
 var should = require('should');
 var request = require('supertest');
 var api = require('../routes/things');
+var db = require('../config/db');
 var Thing = require('../models/things');
 
 
@@ -16,10 +17,14 @@ var    port = process.env.PORT || 3000;
 var    baseUrl = 'http://localhost:' + port;
 
 describe('Things api', function () {
-    // clear out data for tests
-    beforeEach(function (done) {
-        Thing.remove({}, done);
-    });
+    var things = [
+        {name: 'Rock', price: '10'},
+        {name: 'Paper', price: '20'},
+        {name: 'Scissors', price: '30'}
+    ];
+
+
+
 
     it('it exists', function () {
         expect(api).to.exist;
@@ -30,22 +35,30 @@ describe('Things api', function () {
 
         // add three records
         beforeEach(function (done) {
-            var things = [
-                {name: 'Rock', price: '10'},
-                {name: 'Paper', price: '20'},
-                {name: 'Scissors', price: '30'}
-            ]
 
-          // this only works in mongo db NOT MONGOOSE
-         //   Thing.create(things, done);
-            Thing.create(things, function(err, things_){
-                if (err ) {
-                    console.log('Could not create things')
-                }
-                else {
-                    console.log('Successfully created things')
-                }
+
+            db.connect(function (err, conn) {
+                if (err)
+                    console.log(err);
+                else
+                    console.log("connected");
             });
+
+                    // clear out data for tests
+            Thing.remove({})
+                .then(function () {
+                    // this only works in mongo db NOT MONGOOSE
+                    //   Thing.create(things, done);
+                   return  Thing.create(things);
+                })
+                .then(function (things_) {
+                    console.log(things_);
+                    done();
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    done();
+                })
 
 
         });
